@@ -28,42 +28,78 @@
  function main()
  {
     startScreen();
+    displayCurrentPlayer();
     $stdin = fopen('php://stdin', 'r');
     $answer = trim(fgets($stdin));
     switch ($answer)
     {
         case "new":
           createCharacter();
+          return main();
         case "start":
           startBattle();
     }
 
  }
 
+ $playerCount = 0;
+ $player = [];
+
  function createCharacter()
  {
-    $playerCount = 0;
-    $player = [];
-    while($playerCount <= 2)
-    {
-      echo "Enter player name: ";
-      $stdin = fopen('php://stdin', 'r');
-      $name = trim(fgets($stdin));
-      $player[$playerCount] = new Player($name);
-      $playerCount ++;
-    }
-    echo "# Current Player: #\n";
-    $arrlength = count($player);
-    for($x = 0; $x < $arrlength; $x++)
-    {
-      $playerNo = $x + 1;
-      echo "Player " . $playerNo . "\n";
-      echo "Name: " . $player[$x]->name . "\n";
-    }
+    global $playerCount, $player;
+    echo "Put player name: ";
+    $stdin = fopen('php://stdin', 'r');
+    $name = trim(fgets($stdin));
+    $player[$playerCount] = new Player($name);
+    $playerCount ++;
+ }
+
+ function displayCurrentPlayer()
+ {
+  global $playerCount, $player;
+  echo "# Current Player: " . $playerCount . "\n";
+  $arrlength = count($player);
+  for($x = 0; $x < $arrlength; $x++)
+  {
+    $playerNo = $x + 1;
+    echo "Player " . $playerNo . "\n";
+    echo "Name: " . $player[$x]->name . "\n";
+  }
  }
 
  function startBattle()
  {
+    global $player;
+
+    do{
+      echo "Who will attack: ";
+      $stdin = fopen('php://stdin', 'r');
+      $attacker = trim(fgets($stdin));
+      echo "Who will defend: ";
+      $stdin = fopen('php://stdin', 'r');
+      $defender = trim(fgets($stdin));
+
+      $arrlength = count($player);
+      for($x = 0; $x < $arrlength; $x++)
+      {
+        if($player[$x]->name == $attacker)
+        {
+          $currentAttacker = $player[$x];
+          $currentAttacker->mana -= 10;
+        }
+        elseif($player[$x]->name == $defender)
+        {
+          $currentDefender = $player[$x];
+          $currentDefender->blood -= 25;
+        }
+      }
+      echo "Description: \n";
+      echo $currentAttacker->name . " :mana =" . $currentAttacker->mana . ", blood = " . $currentAttacker->blood . "\n";
+      echo $currentDefender->name . " :mana =" . $currentDefender->mana . ", blood = " . $currentDefender->blood . "\n";
+    } while ($currentDefender->blood > 0 || $currentAttacker->mana > 0);
+
+    echo "Game Over";
 
  }
 
